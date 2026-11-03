@@ -1,0 +1,11 @@
+,0
+load_pct,0.04095525550978838
+current_per_load,0.04143485453882961
+bearing_temp_c,0.043987727688589086
+motor_current_a,0.05573849175291179
+discharge_pressure_kpa_vs_baseline,0.0646145477036545
+bearing_rise_over_ambient,0.14154245455179137
+machine_class,0.151075712692484
+vibration_mm_s,0.19577478340392296
+unplanned_stops_14d,0.21820573671232876
+discharge_pressure_kpa,0.3407789569704941
