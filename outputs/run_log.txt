@@ -1,0 +1,235 @@
+{
+  "cleaning": {
+    "rows_raw": 10414,
+    "exact_duplicates_dropped": 80,
+    "vibration_sentinel_to_nan": 10,
+    "pressure_psi_rows_converted": 393,
+    "pressure_psi_sites": [
+      "South"
+    ],
+    "pressure_psi_from": "2024-12-14 16:23:00",
+    "machine_class_unknown_filled": 15,
+    "missing_after_clean": {
+      "vibration_mm_s": 113,
+      "bearing_temp_c": 103
+    },
+    "rows_clean": 10334,
+    "censored_last_7d_rows_excluded": 171,
+    "failure_events_reconstructed": 339
+  },
+  "validation_table": [
+    {
+      "model": "gradient_boosting",
+      "features": "leaky_all_fields",
+      "pr_auc_mean": 0.6909,
+      "pr_auc_sd": 0.0455,
+      "roc_auc": 0.9496,
+      "precision_at_80pct_event_recall": 0.7273,
+      "alerts_per_week_at_80pct_event_recall": 8.3763
+    },
+    {
+      "model": "gradient_boosting",
+      "features": "sensors_plus_history",
+      "pr_auc_mean": 0.3356,
+      "pr_auc_sd": 0.0147,
+      "roc_auc": 0.9009,
+      "precision_at_80pct_event_recall": 0.2065,
+      "alerts_per_week_at_80pct_event_recall": 31.5252
+    },
+    {
+      "model": "logistic_regression",
+      "features": "sensors_only",
+      "pr_auc_mean": 0.3244,
+      "pr_auc_sd": 0.0275,
+      "roc_auc": 0.8864,
+      "precision_at_80pct_event_recall": 0.1568,
+      "alerts_per_week_at_80pct_event_recall": 41.9956
+    },
+    {
+      "model": "logistic_regression",
+      "features": "sensors_plus_history",
+      "pr_auc_mean": 0.3092,
+      "pr_auc_sd": 0.0315,
+      "roc_auc": 0.9035,
+      "precision_at_80pct_event_recall": 0.2282,
+      "alerts_per_week_at_80pct_event_recall": 28.3651
+    },
+    {
+      "model": "gradient_boosting",
+      "features": "sensors_only",
+      "pr_auc_mean": 0.2797,
+      "pr_auc_sd": 0.0233,
+      "roc_auc": 0.8695,
+      "precision_at_80pct_event_recall": 0.1613,
+      "alerts_per_week_at_80pct_event_recall": 40.1299
+    },
+    {
+      "model": "vibration_rule",
+      "features": "-",
+      "pr_auc_mean": 0.2174,
+      "pr_auc_sd": 0.021,
+      "roc_auc": 0.8173,
+      "precision_at_80pct_event_recall": 0.1331,
+      "alerts_per_week_at_80pct_event_recall": 48.3539
+    }
+  ],
+  "test": {
+    "chosen_model": "logistic_regression",
+    "chosen_features": "sensors_plus_history",
+    "threshold_from_validation": 0.5834010517216662,
+    "observation_level": {
+      "chosen": {
+        "pr_auc": 0.4779502605301793,
+        "roc_auc": 0.907626208378088,
+        "base_rate": 0.05
+      },
+      "alternative": {
+        "pr_auc": 0.42592130687870616,
+        "roc_auc": 0.9020036864648393,
+        "base_rate": 0.05
+      },
+      "vibration_rule": {
+        "pr_auc": 0.23855413368754305,
+        "roc_auc": 0.8442269695402528,
+        "base_rate": 0.05
+      },
+      "leaky": {
+        "pr_auc": 0.774866930121696,
+        "roc_auc": 0.9806129079312037,
+        "base_rate": 0.05
+      }
+    },
+    "alternative_model": "gradient_boosting",
+    "operating_point": {
+      "threshold": 0.5834010517216662,
+      "obs_recall": 0.8253968253968254,
+      "obs_precision": 0.21666666666666667,
+      "event_recall": 0.8636363636363636,
+      "events_total": 44,
+      "events_caught": 38,
+      "median_lead_days": 4.240798611111111,
+      "alerts_per_week": 32.35478995867381,
+      "false_alerts_per_week": 25.344585467627823,
+      "alerts_per_machine_per_month": 1.1715130197536476,
+      "alert_rate": 0.19047619047619047
+    },
+    "operating_point_ci95_by_machine_bootstrap": {
+      "pr_auc": [
+        0.36982747610590466,
+        0.5981706050971441
+      ],
+      "event_recall": [
+        0.7587272727272727,
+        0.9518292682926829
+      ],
+      "obs_precision": [
+        0.1652542372881356,
+        0.2766116872609591
+      ],
+      "alerts_per_week": [
+        25.475151420499778,
+        39.91173949406425
+      ]
+    },
+    "rule_at_same_alert_volume": {
+      "threshold": 4.731904761904762,
+      "obs_recall": 0.6666666666666666,
+      "obs_precision": 0.175,
+      "event_recall": 0.7272727272727273,
+      "events_total": 44,
+      "events_caught": 32,
+      "median_lead_days": 4.136979166666666,
+      "alerts_per_week": 32.35478995867381,
+      "false_alerts_per_week": 26.692701715905898,
+      "alerts_per_machine_per_month": 1.1715130197536476,
+      "alert_rate": 0.19047619047619047
+    },
+    "missed_vs_caught_profile": {
+      "missed": {
+        "vibration_mm_s_vs_baseline": 0.04,
+        "bearing_temp_c_vs_baseline": 3.72,
+        "motor_current_a_vs_baseline": -0.27,
+        "unplanned_stops_14d": 1.11
+      },
+      "caught": {
+        "vibration_mm_s_vs_baseline": 0.62,
+        "bearing_temp_c_vs_baseline": 5.33,
+        "motor_current_a_vs_baseline": 2.57,
+        "unplanned_stops_14d": 1.87
+      },
+      "n_missed_events": 6
+    },
+    "by_site": {
+      "Central": {
+        "pr_auc": 0.4339055540381553,
+        "roc_auc": 0.8374201524830002,
+        "base_rate": 0.051685393258426963,
+        "obs_precision": 0.16853932584269662,
+        "event_recall": 0.7058823529411765,
+        "events_total": 17
+      },
+      "North": {
+        "pr_auc": 0.5478495152317212,
+        "roc_auc": 0.9373965802537231,
+        "base_rate": 0.06329113924050633,
+        "obs_precision": 0.27586206896551724,
+        "event_recall": 0.9583333333333334,
+        "events_total": 24
+      },
+      "South": {
+        "pr_auc": 0.3088888888888889,
+        "roc_auc": 0.9719844357976654,
+        "base_rate": 0.019083969465648856,
+        "obs_precision": 0.14285714285714285,
+        "event_recall": 1.0,
+        "events_total": 3
+      }
+    },
+    "sensitivity_without_unplanned_stops": {
+      "pr_auc": 0.3678496949472628,
+      "roc_auc": 0.8863030592353901,
+      "base_rate": 0.05,
+      "obs_precision": 0.15757575757575756,
+      "event_recall": 0.8636363636363636,
+      "alerts_per_week": 44.4878361931765
+    },
+    "sensitivity_no_pressure_fix": {
+      "all_sites": {
+        "pr_auc": 0.08468751262564997,
+        "roc_auc": 0.7197491082202861,
+        "base_rate": 0.05,
+        "event_recall": 0.8409090909090909,
+        "alerts_per_week": 66.19250779045352
+      },
+      "south": {
+        "pr_auc": 0.09125458169355172,
+        "roc_auc": 0.8692607003891051,
+        "base_rate": 0.019083969465648856,
+        "event_recall": 1.0,
+        "alerts_per_week": 35.489142119974204
+      }
+    }
+  },
+  "split": {
+    "val_windows": [
+      [
+        "2024-07-01",
+        "2024-09-01"
+      ],
+      [
+        "2024-09-01",
+        "2024-11-01"
+      ],
+      [
+        "2024-11-01",
+        "2025-01-01"
+      ]
+    ],
+    "test_start": "2025-01-01",
+    "test_end": "2025-02-21 22:20:00",
+    "embargo_days": 7,
+    "n_train_final": 8719,
+    "n_test": 1260,
+    "test_events": 44
+  }
+}
