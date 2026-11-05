@@ -2,6 +2,8 @@
 
 Can we flag machine observations where a failure is likely within the next 7 days, early enough to inspect and with a manageable number of false alarms?
 
+> **Interactive findings page:** open [`report/index.html`](report/index.html) in a browser (download it, then double-click). It has a live slider for the alerts vs failures-caught trade-off. Rebuild it with `python report/build_report.py`.
+
 **Short answer:** there is a real, usable signal in the sensor data, but the two maintenance fields that make the model look excellent are leaking the answer. With them removed, the honest model is **good enough for a supervised pilot (shadow mode), not for unsupervised deployment.**
 
 ---
@@ -102,6 +104,7 @@ cd machine-failure-early-warning
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python run_analysis.py
+python report/build_report.py   # optional: rebuilds the interactive findings page
 ```
 
 Runs in about 1 to 2 minutes and regenerates everything in `outputs/`:
@@ -120,6 +123,7 @@ src/models.py            candidate models
 src/evaluate.py          observation- and event-level metrics, machine bootstrap
 docs/ASSUMPTIONS.md      assumptions and questions for the data owner
 docs/PRESENTATION.md     10-minute talk track
+report/                  interactive findings page (index.html) and the script that builds it
 outputs/                 generated results
 ```
 
