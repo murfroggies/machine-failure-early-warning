@@ -64,12 +64,24 @@ a { color: var(--accent); }
   font-family: var(--mono); font-size: 0.74rem; color: var(--muted); letter-spacing: 0.04em;
 }
 .strip b { color: var(--ink); font-weight: 500; }
+.strip .author { font-family: var(--body); font-size: 0.95rem; letter-spacing: 0; }
+.strip .author b { font-family: var(--display); font-size: 1.15rem; font-weight: 600; }
+.problem { padding-block: 32px 0; }
+.prob-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 12px; border-top: 1px solid var(--line); }
+.prob-grid div { padding: 14px 18px 0 0; display: grid; gap: 2px; }
+.prob-grid div + div { padding-left: 18px; border-left: 1px solid var(--line); }
+.prob-grid b { font-family: var(--display); font-size: 1.45rem; font-weight: 600; line-height: 1.1; }
+.prob-grid span { color: var(--muted); font-size: 0.92rem; }
+@media (max-width: 640px) {
+  .prob-grid { grid-template-columns: 1fr; }
+  .prob-grid div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); margin-top: 12px; }
+}
 .strip nav { margin-left: auto; display: flex; gap: 14px; flex-wrap: wrap; }
 .strip nav a { color: var(--muted); text-decoration: none; }
 .strip nav a:hover { color: var(--ink); }
 
 /* Hero */
-.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px 40px; align-items: end; padding-block: 44px 28px; }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px 40px; align-items: end; padding-block: 36px 28px; }
 .hero .lede { margin-top: 16px; font-size: 1.12rem; color: var(--muted); max-width: 60ch; }
 .stamp {
   border: 2.5px solid var(--ink); padding: 14px 18px 12px; transform: rotate(-2deg);
@@ -198,18 +210,24 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
 
 <div class="wrap">
   <div class="strip">
-    <span>ASSESSMENT <b>ML-EW-001</b></span>
-    <span>FLEET <b>120 machines · 3 sites</b></span>
-    <span>DATA <b>Jan 2024 to Feb 2025</b></span>
-    <span>HORIZON <b>7 days</b></span>
+    <span class="author"><b>Jeanette Tan En Jie</b> · Machine failure early-warning</span>
     <nav aria-label="Sections">
       <a href="#tradeoff">Trade-off</a><a href="#traps">Data traps</a><a href="#signal">Signal</a><a href="#testing">Testing</a><a href="#recommendation">Recommendation</a>
     </nav>
   </div>
 
+  <div class="problem">
+    <div class="eyebrow">Problem</div>
+    <div class="prob-grid">
+      <div><b>120 machines</b><span>checked every ~5 days</span></div>
+      <div><b>Fail within 7 days?</b><span>flag each check as it is recorded</span></div>
+      <div><b>Miss = costly</b><span>but too many false alarms = unusable</span></div>
+    </div>
+  </div>
+
   <header class="hero">
     <div>
-      <div class="eyebrow">Can we flag machines likely to fail within 7 days?</div>
+      <div class="eyebrow">Conclusion</div>
       <h1 style="margin-top:12px">Real signal. Ready for a pilot, not go-live.</h1>
     </div>
     <div class="stamp" aria-label="Verdict: shadow pilot">
