@@ -160,6 +160,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; }
 /* Findings */
 .finding { display: grid; gap: 14px; }
 .finding + .finding { margin-top: 28px; }
+.big { font-family: var(--display); font-size: 1.55rem; font-weight: 600; line-height: 1.15; }
 .tag { font: 500 0.7rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-left: 3px solid; }
 .tag.bad { color: var(--leak); border-color: var(--leak); }
 .tag.warn { color: var(--ink); border-color: var(--safety); }
@@ -209,8 +210,7 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
   <header class="hero">
     <div>
       <div class="eyebrow">Can we flag machines likely to fail within 7 days?</div>
-      <h1 style="margin-top:12px">Yes, there is a real early-warning signal. It is ready for a supervised pilot, not for go-live.</h1>
-      <p class="lede">The sensor data warns of most failures about four days ahead. Two maintenance fields made the model look far better than it is: they record the response to a failure, not a warning of one. With them removed, the honest numbers are below.</p>
+      <h1 style="margin-top:12px">Real signal. Ready for a pilot, not go-live.</h1>
     </div>
     <div class="stamp" aria-label="Verdict: shadow pilot">
       <div class="k">Verdict</div>
@@ -227,8 +227,8 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="sec-head">
       <div class="num">01</div>
       <div class="t">
-        <h2>Choose how many inspections you can afford</h2>
-        <p>Every alert sends a technician. Fewer alerts means more missed failures. Move the slider to see the trade-off on the held-out test period. The recommended setting was fixed on earlier data, before the test period was ever used.</p>
+        <h2>Inspections vs failures caught</h2>
+        <p>Drag the slider.</p>
       </div>
     </div>
     <div class="tool">
@@ -263,8 +263,7 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="sec-head">
       <div class="num">02</div>
       <div class="t">
-        <h2>Three things in the data that would have fooled us</h2>
-        <p>Before modelling, every field was checked for when it becomes known and whether its values make physical sense. Three problems would each have given a misleading result.</p>
+        <h2>Three data traps</h2>
       </div>
     </div>
 
@@ -272,23 +271,20 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
       <div><span class="tag bad">Trap 1 · target leakage</span></div>
       <div class="grid2">
         <div class="panel">
-          <h3>Maintenance fields peak at the failure itself</h3>
+          <h3>Maintenance fields peak at the failure</h3>
           <div class="legend" style="margin-top:10px">
             <span><i class="band"></i>label = 1 (failure within 7 days)</span>
             <span><i style="background:var(--leak)"></i>corrective order in "previous 14 days"</span>
             <span style="color:var(--alt)"><i class="dash"></i><span class="muted">inspection interval = 14 days</span></span>
           </div>
           <div class="chart" id="c-leak"></div>
-          <p class="cap">Share of observations, by days until the nearest failure. Right of zero is after the failure.</p>
         </div>
         <div class="panel" style="display:grid;gap:14px;align-content:start">
-          <p>A count of orders in the <b>previous</b> 14 days can only rise after something happens. This one rises before the failure at the same rate as after it, and is almost zero more than two weeks out. The inspection interval switches to 14 days at exactly the same moment.</p>
-          <p>Both fields most likely record the repair, dated back to the failure. At the moment of scoring, that information would not exist yet.</p>
+          <p class="big">They record the repair, not a warning. <span class="muted">Removed.</span></p>
           <div class="tbl-wrap"><table>
-            <thead><tr><th>Held-out test</th><th class="num">PR-AUC</th></tr></thead>
+            <thead><tr><th>Test score</th><th class="num">PR-AUC</th></tr></thead>
             <tbody id="t-leak"></tbody>
           </table></div>
-          <p class="cap" style="margin-top:0">Both fields were excluded. The leaky version is kept only to show the gap.</p>
         </div>
       </div>
     </div>
@@ -297,15 +293,13 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
       <div><span class="tag warn">Trap 2 · unit change</span></div>
       <div class="grid2">
         <div class="panel">
-          <h3>South site pressure switches to psi on 14 Dec 2024</h3>
+          <h3>South pressure drops 6.9× overnight</h3>
           <div class="chart" id="c-press" style="margin-top:10px"></div>
-          <p class="cap">South site discharge pressure as recorded (3-day median, all 24 machines). Values fall about 6.9 times overnight: 1 psi = 6.895 kPa.</p>
         </div>
         <div class="panel" style="display:grid;gap:14px;align-content:start">
-          <p>All 24 South machines change at once, no other site does, and multiplying by 6.895 restores the earlier range exactly. That is a psi feed writing into a kPa column.</p>
-          <p>The switch lands inside the test period, so a random split would hide it. Left unfixed, the model breaks:</p>
+          <p class="big">psi written as kPa. <span class="muted">Converted back (×6.895).</span></p>
           <div class="tbl-wrap"><table>
-            <thead><tr><th>Held-out test</th><th class="num">PR-AUC</th></tr></thead>
+            <thead><tr><th>Test score</th><th class="num">PR-AUC</th></tr></thead>
             <tbody id="t-press"></tbody>
           </table></div>
         </div>
@@ -315,7 +309,7 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="finding">
       <div><span class="tag warn">Trap 3 · smaller data issues</span></div>
       <div class="panel"><div class="tbl-wrap"><table>
-        <thead><tr><th>Issue</th><th class="num">Rows</th><th>What we did</th></tr></thead>
+        <thead><tr><th>Issue</th><th class="num">Rows</th><th>Fix</th></tr></thead>
         <tbody id="t-clean"></tbody>
       </table></div></div>
     </div>
@@ -326,19 +320,16 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="sec-head">
       <div class="num">03</div>
       <div class="t">
-        <h2>What the machines actually tell us</h2>
-        <p>Readings drift for two to three weeks before a failure, then reset after the repair. That is the wear pattern a maintenance engineer would expect, which is good evidence the model learns something physical.</p>
+        <h2>Readings drift before failure, reset after repair</h2>
       </div>
     </div>
     <div class="panel">
       <div class="legend"><span><i class="band"></i>at-risk window (failure within 7 days)</span><span><i style="background:var(--accent)"></i>fleet average</span></div>
       <div class="grid2" id="c-sensors" style="gap:22px 28px"></div>
-      <p class="cap">Average reading by days until the nearest failure (2-day bins). Right of zero is after the repair.</p>
     </div>
     <div class="panel" style="margin-top:16px">
       <h3>What the model relies on most</h3>
       <div class="chart" id="c-imp" style="margin-top:12px"></div>
-      <p class="cap">Drop in test PR-AUC when each input is shuffled. Larger means the model leans on it more.</p>
     </div>
   </section>
 
@@ -347,33 +338,26 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="sec-head">
       <div class="num">04</div>
       <div class="t">
-        <h2>How it was tested</h2>
-        <p>The model will score future observations of these same 120 machines, so it was always trained on the past and tested on the future. Each label looks 7 days ahead, so a 7-day gap separates training from testing.</p>
+        <h2>Trained on the past, tested on the future</h2>
       </div>
     </div>
     <div class="panel">
       <div class="legend"><span><i style="background:var(--rule);height:10px"></i>train</span><span><i class="band"></i>7-day gap</span><span><i style="background:var(--accent);height:10px"></i>validate (choose model and threshold)</span><span><i style="background:var(--ink);height:10px"></i>final test, used once</span></div>
       <div class="chart" id="c-split"></div>
     </div>
-    <div class="why" style="margin-top:20px">
-      <div><b>Measured per failure</b>A failing machine is usually checked once or twice before it fails. One timely alert is enough to send a technician, so "failures caught" is the main measure.</div>
-      <div><b>Compared with a simple rule</b>"Alert when vibration is high" is what a team could do without ML. The model has to beat it at the same number of alerts.</div>
-      <div><b>Uncertainty by machine</b>Ranges come from resampling whole machines, because readings from one machine are not independent.</div>
-    </div>
-    <div class="grid2" style="margin-top:20px">
+    <div class="grid2" style="margin-top:16px">
       <div class="panel">
-        <h3>Precision and recall on the test period</h3>
+        <h3>Precision vs recall, test period</h3>
         <div class="legend" id="pr-legend" style="margin-top:10px"></div>
         <div class="chart" id="c-pr"></div>
-        <p class="cap">Random guessing scores the base rate. ROC-AUC is reported in the repo but flatters every model at a 5% base rate.</p>
       </div>
       <div class="panel">
-        <h3>Model choice, on validation data</h3>
+        <h3>Model choice (validation)</h3>
         <div class="tbl-wrap" style="margin-top:10px"><table>
           <thead><tr><th>Model</th><th>Inputs</th><th class="num">PR-AUC</th><th class="num">Alerts / wk at 80% caught</th></tr></thead>
           <tbody id="t-val"></tbody>
         </table></div>
-        <p class="cap">Logistic regression and gradient boosting are within noise of each other. Logistic regression needed the fewest alerts and is easier to explain and monitor, so it was chosen.</p>
+        <p class="cap">✓ Fewest alerts, easiest to explain.</p>
       </div>
     </div>
   </section>
@@ -383,36 +367,25 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="sec-head">
       <div class="num">05</div>
       <div class="t">
-        <h2>Recommendation</h2>
-        <p>Develop further through a 3-month shadow pilot. The signal is real and beats the simple rule, but the evidence is not yet strong enough to let the model act on its own.</p>
+        <h2>Recommendation: 3-month shadow pilot</h2>
       </div>
     </div>
     <div class="rec">
       <div class="why">
         <div><b>Small test</b><span id="why-small"></span></div>
-        <div><b>Unconfirmed field timing</b>Unplanned stops is the second most important input, and its logging time is not yet confirmed.</div>
-        <div><b>Alert cost unknown</b>About 4 in 5 alerts find nothing urgent. Whether that is affordable depends on costs only operations can provide.</div>
+        <div><b>Field timing unconfirmed</b>Unplanned stops, corrective orders.</div>
+        <div><b>4 in 5 alerts false</b>Cost trade-off needs operations input.</div>
       </div>
       <div class="steps">
-        <div class="step"><b>Confirm the data</b>Answer the four questions below with the data owner.</div>
-        <div class="step"><b>Shadow pilot</b>Score live for 3 months. Engineers see alerts, decisions stay with them.</div>
-        <div class="step"><b>Set the threshold</b>Use the real cost of a missed failure vs an inspection.</div>
-        <div class="step"><b>Monitor inputs</b>Check units, ranges and missing rates, so a change like the psi switch raises an alarm.</div>
-      </div>
-      <div>
-        <h3 style="margin-bottom:12px">Questions for the data owner</h3>
-        <ol class="qs">
-          <li><span>Q1</span><div><b>Corrective orders:</b> which date is stored (raised, scheduled or completed), and was the 14-day count computed live or rebuilt later?</div></li>
-          <li><span>Q2</span><div><b>Inspection interval:</b> is the change recorded when it is decided or when it takes effect?</div></li>
-          <li><span>Q3</span><div><b>Unplanned stops:</b> is the failure itself counted as a stop, and is there any logging delay?</div></li>
-          <li><span>Q4</span><div><b>Pressure units:</b> did the South feed switch to psi on 14 Dec 2024, and can a unit check be added upstream?</div></li>
-        </ol>
+        <div class="step"><b>Confirm the data</b></div>
+        <div class="step"><b>Shadow pilot</b></div>
+        <div class="step"><b>Set the threshold</b></div>
+        <div class="step"><b>Monitor inputs</b></div>
       </div>
     </div>
   </section>
 
   <footer>
-    <span>Every number on this page is computed by the repository code from <code>data/machine_observations.csv</code>.</span>
     <span>Reproduce: <code>python run_analysis.py</code> then <code>python report/build_report.py</code></span>
   </footer>
 </div>
@@ -431,15 +404,15 @@ const nice = (s) => s.replace(/_/g, " ");
   const ci = T.operating_point_ci95_by_machine_bootstrap;
   const rule = T.rule_at_same_alert_volume;
   const items = [
-    { n: `${OP.events_caught}<small> of ${OP.events_total}</small>`, l: "failures caught", c: `${pct(OP.event_recall)} (range ${pct(ci.event_recall[0])} to ${pct(ci.event_recall[1])})` },
-    { n: Math.round(OP.alerts_per_week), l: "alerts per week", c: `across 120 machines, about ${OP.alerts_per_machine_per_month.toFixed(1)} per machine a month` },
-    { n: `1<small> in ${Math.round(1 / OP.obs_precision)}</small>`, l: "alerts is a real risk", c: `${pct(OP.obs_precision)} precision (range ${pct(ci.obs_precision[0])} to ${pct(ci.obs_precision[1])})` },
-    { n: `${OP.median_lead_days.toFixed(1)}<small> days</small>`, l: "median warning", c: `vs the vibration rule catching ${rule.events_caught} of ${rule.events_total} for the same alerts` },
+    { n: `${OP.events_caught}<small> of ${OP.events_total}</small>`, l: "failures caught", c: `${pct(OP.event_recall)}` },
+    { n: Math.round(OP.alerts_per_week), l: "alerts per week", c: "whole fleet" },
+    { n: `1<small> in ${Math.round(1 / OP.obs_precision)}</small>`, l: "alerts is real", c: `${pct(OP.obs_precision)} precision` },
+    { n: `${OP.median_lead_days.toFixed(1)}<small> days</small>`, l: "warning ahead", c: `vibration rule: ${rule.events_caught} of ${rule.events_total} caught` },
   ];
   $("#kpis").innerHTML = items.map((k) => `<div class="kpi"><div class="n">${k.n}</div><div class="l">${k.l}</div><div class="c">${k.c}</div></div>`).join("");
   const tc = D.test_counts;
-  $("#kpi-cap").textContent = `Held-out test period ${tc.start} to ${tc.end}: ${tc.rows.toLocaleString()} observations, ${tc.events} failures, never used to build or tune the model. Ranges are 95% intervals from resampling machines.`;
-  $("#why-small").textContent = `The test period has ${tc.events} failures over about 7 weeks, so the catch rate could be anywhere from ${pct(ci.event_recall[0])} to ${pct(ci.event_recall[1])}. South had only 3 test failures.`;
+  $("#kpi-cap").textContent = `Unseen test period: Jan to Feb 2025 · ${tc.events} failures`;
+  $("#why-small").textContent = `${tc.events} failures. Catch rate range ${pct(ci.event_recall[0])} to ${pct(ci.event_recall[1])}.`;
 })();
 
 /* ---------- tiny SVG chart kit ---------- */
@@ -522,7 +495,7 @@ function updateTool() {
   $("#r-prec").textContent = pct(r.obs_precision);
   $("#r-lead").textContent = r.median_lead_days == null ? "n/a" : r.median_lead_days.toFixed(1) + " d";
   const missed = r.events_total - r.events_caught;
-  $("#thr-note").textContent = i === recIdx ? "Recommended setting (chosen on validation data)" : `Score threshold ${r.threshold.toFixed(2)}`;
+  $("#thr-note").textContent = i === recIdx ? "Recommended setting" : `Threshold ${r.threshold.toFixed(2)}`;
   const st = $("#status");
   if (r.event_recall >= 0.8 && r.alerts_per_week <= 40) { st.className = "pill good"; st.textContent = "workable"; }
   else if (r.event_recall < 0.8) { st.className = "pill bad"; st.textContent = `misses ${missed} failures`; }
@@ -551,13 +524,13 @@ function drawLeak() {
 }
 const OL = T.observation_level;
 $("#t-leak").innerHTML = `
-  <tr class="leaky"><td>With the two leaky fields</td><td class="num">${OL.leaky.pr_auc.toFixed(2)}</td></tr>
-  <tr class="chosen"><td>Honest model, fields removed</td><td class="num">${OL.chosen.pr_auc.toFixed(2)}</td></tr>`;
+  <tr class="leaky"><td>With leaky fields</td><td class="num">${OL.leaky.pr_auc.toFixed(2)}</td></tr>
+  <tr class="chosen"><td>Honest model</td><td class="num">${OL.chosen.pr_auc.toFixed(2)}</td></tr>`;
 const NP = T.sensitivity_no_pressure_fix;
 $("#t-press").innerHTML = `
-  <tr class="chosen"><td>Pressure converted to kPa</td><td class="num">${OL.chosen.pr_auc.toFixed(2)}</td></tr>
-  <tr class="leaky"><td>Left as recorded</td><td class="num">${NP.all_sites.pr_auc.toFixed(2)}</td></tr>
-  <tr><td class="muted">Random guessing</td><td class="num muted">${OL.chosen.base_rate.toFixed(2)}</td></tr>`;
+  <tr class="chosen"><td>Fixed</td><td class="num">${OL.chosen.pr_auc.toFixed(2)}</td></tr>
+  <tr class="leaky"><td>Not fixed</td><td class="num">${NP.all_sites.pr_auc.toFixed(2)}</td></tr>
+  <tr><td class="muted">Random guess</td><td class="num muted">${OL.chosen.base_rate.toFixed(2)}</td></tr>`;
 
 function drawPress() {
   const pts = D.pressure.map((p) => [new Date(p[0]).getTime(), p[1]]);
@@ -575,11 +548,11 @@ function drawPress() {
 }
 const CL = M.cleaning;
 $("#t-clean").innerHTML = [
-  ["Exact duplicate observations (new record ID, identical readings)", CL.exact_duplicates_dropped, "Kept one copy"],
-  ["Vibration recorded as -999 (sensor error code)", CL.vibration_sentinel_to_nan, "Treated as missing"],
-  ['Machine class "unknown" on one row each of 15 machines', CL.machine_class_unknown_filled, "Filled with the machine's own class"],
-  ["Last 7 days: later failures are not yet in the data", CL.censored_last_7d_rows_excluded, "Left out of training and testing"],
-  ["Missing vibration or bearing temperature after cleaning", (CL.missing_after_clean.vibration_mm_s || 0) + (CL.missing_after_clean.bearing_temp_c || 0), "Kept, with a missing-reading flag"],
+  ["Duplicate rows", CL.exact_duplicates_dropped, "Removed"],
+  ["Vibration = -999 error code", CL.vibration_sentinel_to_nan, "Set to missing"],
+  ['Machine class "unknown"', CL.machine_class_unknown_filled, "Filled from same machine"],
+  ["Last 7 days, labels incomplete", CL.censored_last_7d_rows_excluded, "Excluded"],
+  ["Missing sensor readings", (CL.missing_after_clean.vibration_mm_s || 0) + (CL.missing_after_clean.bearing_temp_c || 0), "Kept, flagged"],
 ].map((r) => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td></tr>`).join("");
 
 /* ---------- 3. Signal ---------- */
