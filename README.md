@@ -84,13 +84,24 @@ Engineered features: each sensor vs the machine's own recent baseline (median of
 
 ---
 
-## 4. Assumptions and questions for the data owner
-Full list in [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md). The ones that change the answer:
+## 4. Assumptions I made
 
-1. **Corrective orders and inspection interval:** when exactly is each order timestamped (raised, scheduled, completed)? Was the 14-day count computed live or rebuilt later? (We assume rebuilt or failure-dated, hence excluded.)
-2. **Unplanned stops:** is the failure itself counted as a stop, and are stops logged in real time? It is the second most important input. Without it the model still works but needs ~44 instead of ~32 alerts/week for the same catch rate.
-3. **Pressure units:** confirm the South feed switched to psi on 14 Dec 2024, and add a unit check upstream.
-4. **Failure definition:** what counts as a "failure" in the records, and are failures between observations always captured?
+Each one is a judgement call. If any turns out wrong, the result could change. Full detail in [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md).
+
+| # | I assumed | Why | What I did | To confirm with data owner |
+|---|---|---|---|---|
+| 1 | **Corrective orders and inspection interval are recorded after a failure** | They peak at the failure itself, not before it | Excluded both | Which date is stored on an order? Is the 14-day count computed live? |
+| 2 | **Unplanned stops are logged in real time** | They rise gradually over 3 weeks before a failure, like a real warning | Kept it | Is the failure itself counted as a stop? |
+| 3 | **South pressure switched to psi on 14 Dec 2024** | All 24 South machines drop ~6.9x on one day; x6.895 restores the old range | Converted back to kPa | Confirm the feed change |
+| 4 | **Each check is scored the moment it is recorded** | The brief says so | Features use only current and earlier checks | Are any fields filled in later by a batch job? |
+| 5 | **The same 120 machines will be scored in production** | It is one fleet | Split by time, not by machine | |
+| 6 | **The last 7 days' labels are incomplete** | Failures after the extract are unknown; positive rate falls to 1.7% | Excluded those 171 rows | |
+| 7 | **Duplicate rows are double-loaded records** | Identical in every field except record ID | Kept one copy | Why are records duplicated? |
+| 8 | **-999 is a sensor error code** | Vibration can't be negative | Set to missing | Are there other error codes? |
+| 9 | **A machine's class never changes** | Each "unknown" sits among one class on all other rows | Filled from the same machine | |
+| 10 | **A missing reading may itself be a warning sign** | Missing vibration rows fail slightly more often (7.8%) | Kept rows, added a flag | |
+| 11 | **One alert in the 7 days before a failure is enough** | It is enough to send a technician | Measured "failures caught" per failure | |
+| 12 | **80% catch rate is a reasonable starting target** | Misses cost more than inspections, but alerts must stay manageable | Set the threshold on validation data | Real cost of a missed failure vs an inspection |
 
 ---
 
