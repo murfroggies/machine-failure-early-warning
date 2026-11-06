@@ -68,19 +68,19 @@ Vibration, bearing temperature and motor current rise, and discharge pressure fa
 
 ---
 
-## 3. Approach and key decisions
+## 3. How I approached it
 
-| Decision | Why |
+| What I did | Why |
 |---|---|
-| **Unit of prediction = one observation**, scored using only that observation and the same machine's earlier ones | The brief says each record is scored the moment it is recorded. All history features use past data only. |
-| **Time-based split with a 7-day gap** (walk-forward validation Jul to Dec 2024, test Jan to Feb 2025) | The label looks 7 days ahead, so a random split leaks future information. Machines are the same in production, so we test on the future, not on new machines. |
-| **Success metric = share of failure events caught vs alerts per week** | That is how operations will experience the tool. Observation-level PR-AUC is reported too. ROC-AUC looks flattering at a 5% base rate, so it is secondary. |
-| **Threshold set on validation** to catch at least 80% of failures, then frozen and applied to test | Missing a failure costs more than an inspection, but alert volume must stay practical. 80% is a starting point for the business to adjust. |
-| **Few, fixed models** (vibration rule, logistic regression, gradient boosting), no heavy tuning | ~340 failures in total; tuning many settings would mostly fit noise. |
-| **Uncertainty by resampling whole machines** | Observations of one machine are correlated; row-level resampling would overstate confidence. |
-| **Failure events reconstructed from the label** (a run of positive labels = one failure) | Needed to measure "failures caught" and lead time. Only used for evaluation, never as a model input. |
+| **Used only past information** for each prediction | In real use, each check is scored the moment it is recorded. The future isn't known yet. |
+| **Trained on older data, tested on newer data**, with a 7-day gap | Real use always predicts the future. The gap stops the 7-day answer leaking into training. |
+| **Compared 3 approaches**: a simple vibration rule, logistic regression, gradient boosting | The rule is the no-ML baseline the models must beat. |
+| **Picked the alert level on older data, then locked it** before the final test | So the final test is a fair, untouched check. |
+| **Judged success by failures caught vs alerts per week** | That is what operations will feel. Accuracy is meaningless when 95% of checks are "no". |
 
-Engineered features: each sensor vs the machine's own recent baseline (median of its previous 8 observations), change since the previous observation, 3-observation vibration slope, bearing temperature above ambient, current per unit load, missing-reading flags.
+**Why logistic regression:** on the practice data it needed the fewest alerts to catch 80% of failures (28 a week vs 32 for gradient boosting). Their overall scores were within noise of each other, so the simpler, easier-to-explain model won.
+
+**Inputs the model uses:** the sensor readings, plus each sensor compared with that machine's own recent normal, the change since the last check, and flags for missing readings.
 
 ---
 
