@@ -212,7 +212,7 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
   <div class="strip">
     <span class="author"><b>Jeanette Tan En Jie</b> · Machine failure early-warning</span>
     <nav aria-label="Sections">
-      <a href="#tradeoff">Trade-off</a><a href="#traps">Data traps</a><a href="#signal">Signal</a><a href="#testing">Testing</a><a href="#recommendation">Recommendation</a>
+      <a href="#tradeoff">Trade-off</a><a href="#traps">Data cleaning</a><a href="#signal">Signal</a><a href="#testing">Testing</a><a href="#recommendation">Recommendation</a>
     </nav>
   </div>
 
@@ -281,12 +281,12 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     <div class="sec-head">
       <div class="num">02</div>
       <div class="t">
-        <h2>Three data traps</h2>
+        <h2>Data cleaning</h2>
       </div>
     </div>
 
     <div class="finding">
-      <div><span class="tag bad">Trap 1 · target leakage</span></div>
+      <div><span class="tag bad">1 · Removed: two leaky columns</span></div>
       <div class="grid2">
         <div class="panel">
           <h3>Maintenance fields peak at the failure</h3>
@@ -308,7 +308,7 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     </div>
 
     <div class="finding">
-      <div><span class="tag warn">Trap 2 · unit change</span></div>
+      <div><span class="tag warn">2 · Fixed: pressure units</span></div>
       <div class="grid2">
         <div class="panel">
           <h3>South pressure drops 6.9× overnight</h3>
@@ -325,7 +325,7 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
     </div>
 
     <div class="finding">
-      <div><span class="tag warn">Trap 3 · smaller data issues</span></div>
+      <div><span class="tag warn">3 · Other fixes</span></div>
       <div class="panel"><div class="tbl-wrap"><table>
         <thead><tr><th>Issue</th><th class="num">Rows</th><th>Fix</th></tr></thead>
         <tbody id="t-clean"></tbody>
@@ -342,11 +342,12 @@ footer code { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); }
       </div>
     </div>
     <div class="panel">
-      <div class="legend"><span><i class="band"></i>at-risk window (failure within 7 days)</span><span><i style="background:var(--accent)"></i>fleet average</span></div>
+      <div class="legend"><span><i class="band"></i>yellow = the 7 days before a failure</span><span><i style="background:var(--accent)"></i>average reading, all machines</span><span>left = before failure · right = after repair</span></div>
       <div class="grid2" id="c-sensors" style="gap:22px 28px"></div>
     </div>
     <div class="panel" style="margin-top:16px">
       <h3>What the model relies on most</h3>
+      <p class="cap" style="margin-top:4px">Longer bar = the model leans on it more.</p>
       <div class="chart" id="c-imp" style="margin-top:12px"></div>
     </div>
   </section>
@@ -575,11 +576,17 @@ $("#t-clean").innerHTML = [
 
 /* ---------- 3. Signal ---------- */
 const SENS = [
-  ["vibration_mm_s", "Vibration", "mm/s"],
-  ["bearing_temp_c", "Bearing temperature", "°C"],
-  ["motor_current_a", "Motor current", "A"],
-  ["discharge_pressure_kpa", "Discharge pressure", "kPa"],
+  ["vibration_mm_s", "Vibration", "mm/s", "↑ rises before failure"],
+  ["bearing_temp_c", "Bearing temperature", "°C", "↑ rises before failure"],
+  ["motor_current_a", "Motor current", "A", "↑ rises before failure"],
+  ["discharge_pressure_kpa", "Discharge pressure", "kPa", "↓ drops before failure"],
 ];
+const NICE = {
+  discharge_pressure_kpa: "Pressure", unplanned_stops_14d: "Unplanned stops (14 days)", vibration_mm_s: "Vibration",
+  machine_class: "Machine class", bearing_rise_over_ambient: "Bearing heat above room", discharge_pressure_kpa_vs_baseline: "Pressure vs its usual",
+  motor_current_a: "Motor current", bearing_temp_c: "Bearing temperature", current_per_load: "Current per unit of load", load_pct: "Load",
+  vibration_mm_s_vs_baseline: "Vibration vs its usual", bearing_temp_c_delta1: "Bearing temp change", days_since_prev_obs: "Days since last check",
+};
 function niceTicks(lo, hi, n = 4) {
   const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
   const step = [1, 2, 2.5, 5, 10].map((s) => s * mag).find((s) => span / s <= n) || mag * 10;
@@ -589,9 +596,9 @@ function niceTicks(lo, hi, n = 4) {
 }
 function drawSensors() {
   const host = $("#c-sensors"); host.innerHTML = "";
-  for (const [k, name, unit] of SENS) {
+  for (const [k, name, unit, dir] of SENS) {
     const box = document.createElement("div"); box.style.minWidth = "0";
-    box.innerHTML = `<div style="font-weight:600;font-size:.95rem;margin-bottom:6px">${name} <span class="muted mono" style="font-size:.75rem">${unit}</span></div><div class="chart"></div>`;
+    box.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><span style="font-weight:600;font-size:.95rem">${name} <span class="muted mono" style="font-size:.75rem">${unit}</span></span><span class="mono" style="font-size:.75rem;color:var(--accent)">${dir}</span></div><div class="chart"></div>`;
     host.appendChild(box);
     const vals = D.sensors.map((p) => p[k]).filter((v) => v != null);
     const ticks = niceTicks(Math.min(...vals), Math.max(...vals), 3);
@@ -613,7 +620,7 @@ function drawImp() {
   const max = rows[0][1], x = scale(0, max, labW, W - 56);
   rows.forEach(([name, v], i) => {
     const yy = i * rowH + 4;
-    const t = el("text", { x: labW - 10, y: yy + 15, "text-anchor": "end", class: "lbl" }, svg); t.textContent = name;
+    const t = el("text", { x: labW - 10, y: yy + 15, "text-anchor": "end", class: "lbl" }, svg); t.textContent = NICE[name] || name;
     el("rect", { x: labW, y: yy + 4, width: Math.max(1, x(v) - labW), height: 15, class: "f-accent", rx: 1 }, svg);
     const vt = el("text", { x: x(v) + 6, y: yy + 15, class: "lbl" }, svg); vt.textContent = v.toFixed(2);
   });
