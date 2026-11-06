@@ -2,7 +2,7 @@
 
 Can we flag machine observations where a failure is likely within the next 7 days, early enough to inspect and with a manageable number of false alarms?
 
-> **Interactive findings page:** open [`report/index.html`](report/index.html) in a browser (download it, then double-click). It has a live slider for the alerts vs failures-caught trade-off. Rebuild it with `python report/build_report.py`.
+> **Interactive findings page: [murfroggies.github.io/machine-failure-early-warning/report](https://murfroggies.github.io/machine-failure-early-warning/report/)**. It has a live slider for the alerts vs failures-caught trade-off. Source: `report/index.html`, rebuilt with `python report/build_report.py`.
 
 **Short answer:** there is a real, usable signal in the sensor data, but the two maintenance fields that make the model look excellent are leaking the answer. With them removed, the honest model is **good enough for a supervised pilot (shadow mode), not for unsupervised deployment.**
 
